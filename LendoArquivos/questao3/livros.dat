@@ -1,0 +1,115 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Livro {
+    char Titulo[50];
+    char Autor[50];
+    short NumReg; //short = 'short int' ou inteiro com 16 bits (máximo de 65536 números)
+    double Preco;
+} Livro;
+
+//função que cria uma struct livro, insere dados nele e retorna esse livro inserido
+Livro GetLivro() {
+    Livro livro; //cria uma estrutura do tipo livro
+
+    printf("\n\tDigite o Titulo: ");
+    scanf("%[^\n]s", livro.Titulo);
+
+    setbuf(stdin, NULL);
+    printf("\n\tDigite o nome do Autor: ");
+    scanf("%[^\n]s", livro.Autor);
+
+    printf("\n\tDigite o numero do registro: ");
+    scanf("%hd", &livro.NumReg);
+
+    printf("\n\tDigite o Preço: ");
+    scanf("%lf", &livro.Preco);
+
+    return livro;
+}
+
+int main() {
+    Livro livro;
+    char resp;
+    FILE *fptr;
+
+    if ((fptr = fopen("Livros.Dat", "ab")) == NULL)
+        return 1;
+
+    do {
+        system("clear");
+        livro = GetLivro(); //chama a função getLivro que preenche e retorna o livro preenchido
+
+        if (fwrite(&livro, sizeof(livro), 1, fptr) != 1)
+            break;
+
+        setbuf(stdin, NULL);
+        printf("\nMais um livro (s/n)? ");
+        resp = getchar(); // ("%c", &resp);
+        printf("\n%c\n", resp);
+
+        getc(stdin); //captura o \n do buffer de entrada o retirando do buffer.
+    } while (resp != 'n' && resp != 'N');
+
+    fclose(fptr);
+    printf("Encerrando o programa!!\n\n");
+    return 0;
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Livro{
+    char Titulo[50];
+    char Autor[50];
+    short NumReg; //short é um inteiro de 2 bytes
+    double Preco;
+}Livro;
+
+//função que imprime os livros de um arquivo
+void imprimeLivro(Livro livro){
+    static int cont;
+    ++cont;
+    printf("\n\nLIVRO nº: %d", cont);
+    printf("\n\tTitulo: %s", livro.Titulo);
+    printf("\n\tAutor: %s", livro.Autor);
+    printf("\n\tRegistro %hd: ", livro.NumReg);
+    printf("\tPreco: %.2lf", livro.Preco);
+}
+
+int main(){
+    Livro livro;
+    FILE *fptr;
+
+    if((fptr = fopen("Livros.Dat", "rb"))==NULL)
+        exit(1);
+
+    //le uma unidade de livro por vez e guarda no endereço de livro. caso retorne 0
+    //é porque não há mais livro no arquivo, logo encerra a repetição
+    while(fread(&livro, sizeof(livro), 1, fptr) == 1)
+        imprimeLivro(livro);
+
+    fclose(fptr);
+    return 0;
+}
+
+1. O que faz a função fread()?A função fread() é utilizada para ler blocos de dados de um arquivo binário. No código apresentado, ela lê o 
+conteúdo correspondente ao tamanho de uma estrutura Livro (sizeof(livro)) diretamente do arquivo e o armazena no endereço de memória da variável 
+livro. Ela retorna o número de itens lidos com sucesso; se retornar 0, indica que o fim do arquivo foi atingido
+
+2. O que faz a função fwrite()?A função fwrite() realiza a operação inversa à fread(), gravando blocos de dados da memória diretamente em um arquivo 
+binário. No programa de cadastro, ela pega os dados preenchidos na struct Livro e os grava como um registro contínuo no arquivo "Livros.dat".
+
+3. Qual o modo de abertura do arquivo "Livros.dat" em cada um dos códigos acima?No programa de gravação (escrita): O arquivo é aberto com o modo 
+"ab". Esse modo significa append binary (anexar binário), o que permite adicionar novos registros ao final do arquivo sem apagar os dados que já 
+existem.No programa de leitura: O arquivo é aberto com o modo "rb". 
+
+4. Como são armazenados os dados no arquivo "Livros.dat"?Os dados são armazenados em formato binário, representando a disposição exata dos bytes 
+da estrutura na memória do computador. Ao tentar abrir esse arquivo em um editor de texto comum (como o Bloco de Notas), você verá caracteres 
+ilegíveis ou "lixo de memória".
+
+
+
+
+
+
